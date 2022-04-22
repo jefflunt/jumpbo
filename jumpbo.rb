@@ -10,9 +10,11 @@ class Jumpbo
   }
 
   attr_reader :deck,
-              :players
+              :players,
+              :turn
 
   def initialize(player_count)
+    @turn = 0
     @deck = CardHolder.new('Deck', :draw)
     GAME_CARDS.shuffle.each{|c| @deck.push(:draw, c) }
 
@@ -22,6 +24,14 @@ class Jumpbo
     players.each do |p|
       CARDS_PER_PLAYER[player_count].times{ p.push(:stock, deck.pop(:draw)) }
     end
+  end
+
+  def take_turn
+    @turn += 1
+  end
+
+  def player_i
+    turn % players.size
   end
 
   def to_s
