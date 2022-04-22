@@ -11,10 +11,12 @@ class Jumpbo
 
   attr_reader :deck,
               :players,
-              :turn
+              :turn,
+              :winner
 
   def initialize(player_count)
     @turn = 0
+    @winner = nil
     @deck = CardHolder.new('Deck', :draw)
     GAME_CARDS.shuffle.each{|c| @deck.push(:draw, c) }
 
@@ -26,8 +28,13 @@ class Jumpbo
     end
   end
 
-  def take_turn
-    @turn += 1
+  def play_game
+    loop do
+      puts "TURN #{turn + 1}, Player #{player_i + 1}"
+      _take_turn
+
+      break if _game_over?
+    end
   end
 
   def player_i
@@ -39,6 +46,16 @@ class Jumpbo
          Deck: #{deck[:draw].size}
       Players: #{players.size}
       #{players.map(&:to_s).join("\n")}
+       #{'WINNER:'.green} #{winner ? players[player_i - 1].label : '<none>'}
     DEBUG
+  end
+
+  def _take_turn
+    players[player_i].pop(:stock) if rand(2) == 0
+    @turn += 1
+  end
+
+  def _game_over?
+    !!(@winner = players.detect{|p| p[:stock].size == 0 })
   end
 end

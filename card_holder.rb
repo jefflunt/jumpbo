@@ -24,6 +24,8 @@
 #   not the specified card exists in that placement. This is useful if you
 #   simply want to know if a CardHolder has a given card without taking it.
 class CardHolder
+  attr_reader :label
+
   def initialize(label, *placements)
     @label = label
     @cards = {}
