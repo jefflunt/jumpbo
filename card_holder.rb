@@ -29,9 +29,20 @@ class CardHolder
     placements.each{|p| @cards[p] = [] }
   end
 
-  # Passes method calls through to the underlying card placements
-  def method_missing(method, *args, &block)
-    raise NoMethodError("invalid method `#{method}' for #{self}:#{self.class.name}") unless %i(push pop shuft unshift).include?(method)
+  # Passes the following method calls down to CardHolder placements, which are
+  # Arrays:
+  # - #push
+  # - #pop
+  # - #shift
+  # - #unshift
+  #
+  # ... and raises an error otherwise.
+  #
+  # Also raises an error if:
+  # - the specified card is nil
+  # - the specified placement is invalid
+  def method_missing(method, card, placement)
+    raise NoMethodError.new("invalid method `#{method}' for #{self}:#{self.class.name}") unless %i(push pop shift unshift).include?(method)
     raise "nil card passed to `#{method}'" unless card
     raise "invalid card placement, `#{placement}`" unless @cards[placement]
 
