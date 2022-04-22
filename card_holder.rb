@@ -24,7 +24,8 @@
 #   not the specified card exists in that placement. This is useful if you
 #   simply want to know if a CardHolder has a given card without taking it.
 class CardHolder
-  def initialize(*placements)
+  def initialize(label, *placements)
+    @label = label
     @cards = {}
     placements.each{|p| @cards[p] = [] }
   end
@@ -82,5 +83,12 @@ class CardHolder
 
   def shuffle!(placement)
     @cards[placement].shuffle!
+  end
+
+  def to_s
+    <<~DEBUG
+        #{@label}:
+      #{@cards.map{|pl, cards| "#{pl.to_s.rjust(12)}: (#{self[pl].size}) #{cards[0..10].join(', ')} ..." }.join("\n") }
+    DEBUG
   end
 end
