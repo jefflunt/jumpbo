@@ -1,17 +1,11 @@
-# The CardHolder module implements a number of methods for dealing cards to,
-# taking cards from, and peeking at cards from a class that includes this
-# module.
+# The CardHolder class implements a number of methods for dealing cards to,
+# taking cards from, and peeking at named groups of cards. Imagine a game of
+# blackjack: a CardHolder instance could represent a player, our the house. In
+# a game like Uno it could represent the draw and discard piles that everyone
+# shares, or a player's hand.
 #
-# For exapmle, in a game of blackjack you have several card holders:
-# - the deck from which cards are dealt
-# - each player
-# - the house
-#
-# Each cardholder also has a series of placements:
-# - the deck has only a single stack of cards
-# - each player has visible cards
-# - the house has a visible card (one placement) and a hidden card (a different
-#   placement)
+# A CardHolder is really just a logical container for 1 or more named groups of
+# cards.
 #
 # Placements are simply arrays of cards. Cords can be moved from one placement
 # to another, or between players by using the normal ruby Array methods:
@@ -20,7 +14,8 @@
 # - #push
 # - #pop
 #
-# Three additional methods are added to this module for convenience:
+# In addition to the normal Array methods, three additional methods are addeto
+# this class for convenience:
 # - #peek(placement, place) returns the card at the beginning or end of the
 #   specified placement and place (:front or :back of a placement Array)
 # - #take(card, placement) removes and returns the specified card. If duplicate
@@ -28,10 +23,17 @@
 # - #can_take?(card, placement) returns true or false, indicating whether or
 #   not the specified card exists in that placement. This is useful if you
 #   simply want to know if a CardHolder has a given card without taking it.
-module CardHolder
-  def method_missing(method, card, placement)
-    raise "nil card cannot be dealt" unless card
-    raise "Invalid card placement, `#{placement}`" unless @cards[placement]
+class CardHolder
+  def initialize(*placements)
+    @cards = {}
+    placements.each{|p| @cards[p] = [] }
+  end
+
+  # Passes method calls through to the underlying card placements
+  def method_missing(method, *args, &block)
+    raise NoMethodError("invalid method `#{method}' for #{self}:#{self.class.name}") unless %i(push pop shuft unshift).include?(method)
+    raise "nil card passed to `#{method}'" unless card
+    raise "invalid card placement, `#{placement}`" unless @cards[placement]
 
     @cards[placement].send(method, card)
   end
@@ -39,6 +41,10 @@ module CardHolder
   # Return the list of placements available.
   def placements
     @cards.keys
+  end
+
+  def [](placement)
+    @cards[placement]
   end
 
   # Returns the card at the specified placement, and place.
@@ -61,5 +67,9 @@ module CardHolder
   # otherwise.
   def can_take?(card, placement)
     !@cards[placement].nil? && !!@cards[placement]
+  end
+
+  def shuffle!(placement)
+    @cards[placement].shuffle!
   end
 end
