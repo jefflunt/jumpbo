@@ -1,4 +1,4 @@
 require_relative './jumpbo'
 
-j = Jumpbo.new(3)
+j = Jumpbo.new(2)
 puts j

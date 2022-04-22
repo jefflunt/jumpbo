@@ -14,10 +14,14 @@ class Jumpbo
 
   def initialize(player_count)
     @deck = CardHolder.new('Deck', :draw)
-    GAME_CARDS.shuffle.each{|c| @deck.push(c, :draw) }
+    GAME_CARDS.shuffle.each{|c| @deck.push(:draw, c) }
 
     @players = []
     player_count.times{|n| @players << CardHolder.new("Player #{n + 1}", :hand, :stock, :discard1, :discard2, :discard3, :discard4) }
+
+    players.each do |p|
+      CARDS_PER_PLAYER[player_count].times{ p.push(:stock, deck.pop(:draw)) }
+    end
   end
 
   def to_s

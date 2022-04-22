@@ -42,12 +42,17 @@ class CardHolder
   # Also raises an error if:
   # - the specified card is nil
   # - the specified placement is invalid
-  def method_missing(method, card, placement)
+  def method_missing(method, placement, card=nil)
     raise NoMethodError.new("invalid method `#{method}' for #{self}:#{self.class.name}") unless %i(push pop shift unshift).include?(method)
-    raise "nil card passed to `#{method}'" unless card
     raise "invalid card placement, `#{placement}`" unless @cards[placement]
+    raise "nil card passed to `#{method}'" if %i(push shift).include?(method) && card.nil?
 
-    @cards[placement].send(method, card)
+    case method
+    when :push, :shift
+      @cards[placement].send(method, card)
+    when :pop, :unshift
+      @cards[placement].send(method)
+    end
   end
 
   # Return the list of placements available.
