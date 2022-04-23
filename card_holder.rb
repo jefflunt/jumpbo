@@ -26,7 +26,9 @@
 class CardHolder
   attr_reader :label
 
-  def initialize(label, *placements)
+  # Takes a label (a friendly name for this CardHolder), and a list of
+  # placements to initialize. The label can be any String, or nil
+  def initialize(label, ai, *placements)
     @label = label
     @cards = {}
     placements.each{|p| @cards[p] = [] }
@@ -92,10 +94,22 @@ class CardHolder
     @cards[placement].shuffle!
   end
 
-  def to_s
+  def to_s(as_stack: true)
     <<~DEBUG
-        #{@label}:
-      #{@cards.map{|pl, cards| "#{pl.to_s.rjust(12)}: (#{self[pl].size}) #{cards[0..10].join(', ')} ..." }.join("\n") }
+      #{@label}:
+      #{
+        @cards.map do |pl, cards|
+          "#{pl.to_s.rjust(12)}: (#{self[pl].size}) " +
+            "#{(as_stack ? cards.reverse : cards)[0..9].join(', ')}" +
+            "#{cards.length > 10 ? ' ...' : ''}"
+        end.join("\n")
+      }
     DEBUG
+  end
+
+  #############################################
+  # AI methods, which maybe should be moved out
+  #############################################
+  def make_move(board_state)
   end
 end
